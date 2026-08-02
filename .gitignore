@@ -49,7 +49,6 @@ htmlcov/
 *.h5
 *.pt
 *.pth
-models/
 
 # node / frontend
 node_modules/
