@@ -1,0 +1,27 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+PROJECT_REQUIREMENTS.md
+
+
+# Python Cache
+__pycache__/
+*.py[cod]
+
+# Environment Secrets
+.env
+
+# Data Files (Keep datasets local)
+data/*.csv
+data/*.xlsx
+
+# Frontend Dependencies & Builds
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Database
+backend/*.db
+backend/*.sqlite3
