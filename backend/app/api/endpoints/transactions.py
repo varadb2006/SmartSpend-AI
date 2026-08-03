@@ -9,6 +9,7 @@ from app.models.transaction import Transaction
 from app.schemas.transaction import TransactionCreate, TransactionResponse
 from app.api.deps import get_current_user
 from app.services.categorizer import train_categorizer, predict_categories
+from app.services.anamoly_detector import flag_anomalies
 
 router = APIRouter()
 
@@ -51,7 +52,7 @@ async def upload_transactions(file: UploadFile = File(...), db : Session = Depen
     for index, row in df.iterrows():
         provided_category = row.get("Category")
         if pd.isna(provided_category) or str(provided_category).strip() == "":
-            final_category = predict_categories[index]
+            final_category = predicted_categories[index]
         else:
             final_category= str(provided_category)
 
@@ -84,3 +85,20 @@ def trigger_model_training(db: Session = Depends(get_db),current_user: User = De
         raise HTTPException(status_code=400, detail="Not enough categorized data to train the model. Minimum 10 categorized transactions required.")
 
     return {"message": "XGBoost categorizer trained successfully!"}
+
+@router.post("/detect-anomalies")
+def trigger_anomaly_detection(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id,Transaction.transaction_type == "EXPENSE").all()
+    if len(transactions) < 5:
+        raise HTTPException(status_code=400, detail="Need at least 5 expenses to run anomaly detection.")
+    df = pd.DataFrame([{"amount": t.amount} for t in transactions])
+    anomaly_flags = flag_anomalies(df)
+    anomalies_found = 0
+    for idx, transaction in enumerate(transactions):
+        transaction.is_anomaly = anomaly_flags[idx]
+        if anomaly_flags[idx]:
+            anomalies_found += 1
+
+    db.commit()
+
+    return {"message": "Anomaly detection complete","total_analyzed": len(transactions), "anomalies_found": anomalies_found }
