@@ -59,7 +59,7 @@ async def upload_transactions(file: UploadFile = File(...), db : Session = Depen
             category=str(category)
         )
         db.add(db_transaction)
-        transactions_added += 1
+        transaction_Added += 1
 
     db.commit()
     
