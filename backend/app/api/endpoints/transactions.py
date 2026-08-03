@@ -65,5 +65,5 @@ async def upload_transactions(file: UploadFile = File(...), db : Session = Depen
     
     return {
         "message": "File processed successfully", 
-        "total_processed": transactions_added
+        "total_processed": transaction_Added
     }
