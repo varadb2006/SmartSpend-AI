@@ -10,6 +10,7 @@ from app.schemas.transaction import TransactionCreate, TransactionResponse
 from app.api.deps import get_current_user
 from app.services.categorizer import train_categorizer, predict_categories
 from app.services.anamoly_detector import flag_anomalies
+from app.services.forecaster import forecast_next_month
 
 router = APIRouter()
 
@@ -102,3 +103,17 @@ def trigger_anomaly_detection(db: Session = Depends(get_db),current_user: User =
     db.commit()
 
     return {"message": "Anomaly detection complete","total_analyzed": len(transactions), "anomalies_found": anomalies_found }
+
+@router.get("/forecast")
+def get_spending_forecast(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id,Transaction.transaction_type == "EXPENSE").all()
+    if not transactions:
+        return {"forecasted_amount": 0.0, "message": "No expense data available."}
+
+    df = pd.DataFrame([{"transaction_date": t.transaction_date, "amount": t.amount} for t in transactions])
+    predicted_amount = forecast_next_month(df)
+
+    if predicted_amount == 0.0:
+        return {"forecasted_amount": 0.0,"message": "Need at least 3 months of historical data to generate a reliable forecast."}
+
+    return {"forecasted_amount": predicted_amount, "message": "Forecast generated successfully."}
