@@ -8,6 +8,7 @@ from app.models.user import User
 from app.models.transaction import Transaction
 from app.schemas.transaction import TransactionCreate, TransactionResponse
 from app.api.deps import get_current_user
+from app.services.categorizer import train_categorizer, predict_categories
 
 router = APIRouter()
 
@@ -44,11 +45,15 @@ async def upload_transactions(file: UploadFile = File(...), db : Session = Depen
     if not required_columns.issubset(df.columns):
         raise HTTPException( status_code=400, detail=f"Missing required columns. File must contain: {', '.join(required_columns)}")
 
+    ml_df = pd.DataFrame({"description" : df["Description"].astype(str), "amount" : pd.to_numeric(df["Amount"], errors='coerce').fillna(0.0)})
+    predicted_categories = predict_categories(ml_df)
     transaction_Added =0
-    for _, row in df.iterrows():
-        category = row.get("Category", "Uncategorized")
-        if pd.isna(category):
-            category = "Uncategorized"
+    for index, row in df.iterrows():
+        provided_category = row.get("Category")
+        if pd.isna(provided_category) or str(provided_category).strip() == "":
+            final_category = predict_categories[index]
+        else:
+            final_category= str(provided_category)
 
         db_transaction = Transaction(
             user_id=current_user.id,
@@ -56,7 +61,7 @@ async def upload_transactions(file: UploadFile = File(...), db : Session = Depen
             description=str(row["Description"]),
             amount=float(row["Amount"]),
             transaction_type=str(row["Transaction_Type"]).upper(),
-            category=str(category)
+            category=final_category
         )
         db.add(db_transaction)
         transaction_Added += 1
@@ -67,3 +72,15 @@ async def upload_transactions(file: UploadFile = File(...), db : Session = Depen
         "message": "File processed successfully", 
         "total_processed": transaction_Added
     }
+
+@router.post("/train-categorizer")
+def trigger_model_training(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
+    transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id).all()
+    if not transactions:
+        raise HTTPException(status_code=400, detail="No transactions found to train on.")
+    df = pd.DataFrame([{"description": t.description,"amount": t.amount,"category": t.category} for t in transactions])
+    success = train_categorizer(df)
+    if not success:
+        raise HTTPException(status_code=400, detail="Not enough categorized data to train the model. Minimum 10 categorized transactions required.")
+
+    return {"message": "XGBoost categorizer trained successfully!"}
