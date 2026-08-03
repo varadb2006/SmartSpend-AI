@@ -25,3 +25,6 @@ frontend/.env.local
 # Database
 backend/*.db
 backend/*.sqlite3
+
+# Machine Learning Models
+backend/model_artifacts/*.joblib
