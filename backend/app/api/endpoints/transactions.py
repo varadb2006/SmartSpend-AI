@@ -11,8 +11,12 @@ from app.api.deps import get_current_user
 from app.services.categorizer import train_categorizer, predict_categories
 from app.services.anamoly_detector import flag_anomalies
 from app.services.forecaster import forecast_next_month
+from pydantic import BaseModel
 
 router = APIRouter()
+
+class CategoryUpdate(BaseModel):
+    category: str
 
 @router.post("/", response_model=TransactionResponse)
 def create_transaction( transaction_in : TransactionCreate, db:Session = Depends(get_db), current_user : User = Depends(get_current_user)):
@@ -23,8 +27,8 @@ def create_transaction( transaction_in : TransactionCreate, db:Session = Depends
     return db_transaction
 
 @router.get("/", response_model=List[TransactionResponse])
-def get_transactions(db: Session = Depends(get_db), current_user:  User = Depends(get_current_user)):
-    transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id).all()
+def get_transactions(db: Session = Depends(get_db), current_user:  User = Depends(get_current_user), skip : int = 0, limit: int =  100):
+    transactions = db.query(Transaction).offset(skip).limit(limit).all()
     return transactions
 
 @router.post("/upload")
@@ -43,7 +47,7 @@ async def upload_transactions(file: UploadFile = File(...), db : Session = Depen
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error reading file: {str(e)}")
 
-    required_columns = {"Date", "DEscription", "Amount", "Transaction_Type"}
+    required_columns = {"Date", "Description", "Amount", "Transaction_Type"}
     if not required_columns.issubset(df.columns):
         raise HTTPException( status_code=400, detail=f"Missing required columns. File must contain: {', '.join(required_columns)}")
 
@@ -89,7 +93,10 @@ def trigger_model_training(db: Session = Depends(get_db),current_user: User = De
 
 @router.post("/detect-anomalies")
 def trigger_anomaly_detection(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
-    transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id,Transaction.transaction_type == "EXPENSE").all()
+    transactions = db.query(Transaction).filter(
+        Transaction.user_id == current_user.id,
+        Transaction.transaction_type.in_(["debit", "DEBIT", "expense", "EXPENSE", "Debit", "Expense"])
+    ).all()
     if len(transactions) < 5:
         raise HTTPException(status_code=400, detail="Need at least 5 expenses to run anomaly detection.")
     df = pd.DataFrame([{"amount": t.amount} for t in transactions])
@@ -105,8 +112,12 @@ def trigger_anomaly_detection(db: Session = Depends(get_db),current_user: User =
     return {"message": "Anomaly detection complete","total_analyzed": len(transactions), "anomalies_found": anomalies_found }
 
 @router.get("/forecast")
-def get_spending_forecast(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
-    transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id,Transaction.transaction_type == "EXPENSE").all()
+def get_spending_forecast(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    transactions = db.query(Transaction).filter(
+        Transaction.user_id == current_user.id,
+        Transaction.transaction_type.in_(["debit", "DEBIT", "expense", "EXPENSE", "Debit", "Expense"])
+    ).all()
+    
     if not transactions:
         return {"forecasted_amount": 0.0, "message": "No expense data available."}
 
@@ -114,6 +125,28 @@ def get_spending_forecast(db: Session = Depends(get_db),current_user: User = Dep
     predicted_amount = forecast_next_month(df)
 
     if predicted_amount == 0.0:
-        return {"forecasted_amount": 0.0,"message": "Need at least 3 months of historical data to generate a reliable forecast."}
+        return {"forecasted_amount": 0.0, "message": "Need at least 3 months of historical data to generate a reliable forecast."}
 
     return {"forecasted_amount": predicted_amount, "message": "Forecast generated successfully."}
+
+@router.put("/{transaction_id}/category")
+def update_transaction_category(
+    transaction_id: int, 
+    update_data: CategoryUpdate, 
+    db: Session = Depends(get_db)
+):
+    transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+    
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+        
+    transaction.category = update_data.category
+    db.commit()
+    db.refresh(transaction)
+    
+    return {
+        "message": "Category updated successfully", 
+        "transaction_id": transaction.id,
+        "description": transaction.description,
+        "updated_category": transaction.category
+    }

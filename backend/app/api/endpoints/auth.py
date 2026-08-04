@@ -4,7 +4,7 @@ from app.db.session import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin, UserResponse, Token
 from app.core.security import get_password_hash, verify_password, create_access_token
-
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 
@@ -27,11 +27,11 @@ def register(user_in: UserCreate, db: Session=Depends(get_db)):
     return db_user
 
 
-@router.post("/login", response_model=Token)
-def login(user_in: UserLogin, db: Session = Depends(get_db())):
-    user = db.query(User).filter(User.email == user_in.email).first()
+@router.post("/login")
+def login(form_data : OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == form_data.username).first()
 
-    if not user or not verify_password(user_in.password, user.hashed_password):
+    if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incoreect email or password")
 
     access_token = create_access_token(data={"sub":str(user.id)})
