@@ -14,8 +14,7 @@ __pycache__/
 .env
 
 # Data Files (Keep datasets local)
-data/*.csv
-data/*.xlsx
+
 
 # Frontend Dependencies & Builds
 frontend/node_modules/
@@ -27,4 +26,3 @@ backend/*.db
 backend/*.sqlite3
 
 # Machine Learning Models
-backend/model_artifacts/*.joblib

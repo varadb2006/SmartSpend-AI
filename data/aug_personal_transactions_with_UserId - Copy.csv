@@ -1,0 +1,9 @@
+Transaction_Type,Date,Description,Amount
+EXPENSE,8/4/2026,Uber Ride,45
+EXPENSE,8/4/2026,Starbucks Coffee,5.5
+EXPENSE,8/5/2026,Netflix Subscription,15.99
+EXPENSE,8/5/2026,Shell Gas Station,40
+EXPENSE,8/6/2026,Whole Foods Market,120.5
+INCOME,8/6/2026,TechCorp Salary,3500
+EXPENSE,8/7/2026,Home Depot Hardware,85.2
+EXPENSE,8/7/2026,Planet Fitness Dues,10
