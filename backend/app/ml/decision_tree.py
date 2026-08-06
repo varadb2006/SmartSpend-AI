@@ -80,7 +80,7 @@ def train_and_generate_tree(df: pd.DataFrame, user_id: int):
     
     # Plot PNG
     plt.figure(figsize=(16, 10))
-    tree.plot_tree(clf, feature_names=feature_names, class_names=clf.classes_, filled=True, rounded=True, fontsize=10)
+    tree.plot_tree(clf, feature_names=feature_names, class_names=clf.classes_, filled=True, rounded=True, fontsize=10, impurity=False, proportion=False)
     plt.savefig(img_path, format='png', bbox_inches='tight')
     plt.close()
 

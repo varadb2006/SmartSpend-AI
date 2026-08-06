@@ -40,6 +40,7 @@ def train_decision_tree(db: Session = Depends(get_db), current_user: User = Depe
     # Generate insights and recommendations
     processed_df = tree_result['processed_df']
     insights = generate_insights(processed_df)
+    insights["feature_importances"] = tree_result.get("importances", {})
     recommendations = generate_recommendations(processed_df, insights)
 
     # Save to database

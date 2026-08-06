@@ -16,25 +16,21 @@
   padding: 13px 16px; border-bottom: 1px solid var(--border);
   font-size: 13px; color: var(--text-primary);
 }
-.data-table tr { transition: background 0.15s; }
+.data-table tr { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
 .data-table tr:hover td { background: rgba(0,0,0,0.02); }
 .data-table tr.anomaly-row td { 
-  background: rgba(239, 68, 68, 0.05);
-  border-top: 1px solid rgba(239, 68, 68, 0.5);
-  border-bottom: 1px solid rgba(239, 68, 68, 0.5);
+  background: rgba(245, 158, 11, 0.05); /* Use amber for anomalies instead of harsh red */
 }
-.data-table tr.anomaly-row td:first-child {
-  border-left: 1px solid rgba(239, 68, 68, 0.5);
-}
-.data-table tr.anomaly-row td:last-child {
-  border-right: 1px solid rgba(239, 68, 68, 0.5);
+.data-table tr.anomaly-row:hover td {
+  background: rgba(245, 158, 11, 0.08);
 }
 .data-table tbody tr:last-child td { border-bottom: none; }
 
 /* ── Transaction Amount Typography ───────────────────────────────────────── */
-.txn-amount {
+.transaction-amount {
   font-family: 'Outfit', sans-serif;
-  font-weight: 600; font-size: 15px;
+  font-weight: 600; font-size: 14.5px;
+  color: var(--text-primary);
 }
-.txn-amount--credit { color: var(--green); }
-.txn-amount--debit  { color: var(--red); }
+.transaction-amount.credit { color: var(--green); }
+.transaction-amount.debit  { color: var(--text-primary); }

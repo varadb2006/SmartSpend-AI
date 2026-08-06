@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 from datetime import datetime
 
 class Recommendation(BaseModel):
@@ -17,6 +17,7 @@ class Insights(BaseModel):
     highest_single: float
     monthly_waste: float
     total_savings_potential: float
+    feature_importances: Optional[Dict[str, float]] = None
 
 class SpendingAnalysisResponse(BaseModel):
     id: int

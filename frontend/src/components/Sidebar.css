@@ -42,17 +42,20 @@
   color: var(--text-secondary);
   font-weight: 500; font-size: 14px;
   cursor: pointer; text-decoration: none;
-  transition: all 0.18s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-left: 3px solid transparent;
   margin: 1px 0;
+  outline: none;
 }
+.nav-item:focus-visible { background: rgba(0,0,0,0.03); outline: 2px solid var(--accent-lime); outline-offset: -2px; }
 .nav-item:hover { color: var(--text-primary); background: rgba(0,0,0,0.03); }
 .nav-item.active {
   color: var(--accent-lime);
   background: var(--accent-lime-soft);
   border-left-color: var(--accent-lime);
 }
-.nav-item .nav-icon { font-size: 17px; flex-shrink: 0; width: 22px; text-align: center; }
+.nav-item .nav-icon { font-size: 17px; flex-shrink: 0; width: 22px; text-align: center; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.nav-item:hover .nav-icon { transform: scale(1.1); }
 
 .nav-divider { height: 1px; background: var(--border); margin: 8px 24px; }
 
@@ -73,9 +76,11 @@
 
 .logout-btn {
   background: none; border: none; cursor: pointer;
-  color: var(--text-secondary); font-size: 17px; padding: 4px; transition: color 0.2s;
+  color: var(--text-secondary); font-size: 17px; padding: 4px; border-radius: 4px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
 }
-.logout-btn:hover { color: var(--red); }
+.logout-btn:focus-visible { outline: 2px solid var(--accent-lime); }
+.logout-btn:hover { color: var(--red); background: var(--red-soft); }
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {

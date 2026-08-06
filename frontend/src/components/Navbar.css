@@ -50,9 +50,17 @@
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: color 0.2s, transform 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: 'Inter', sans-serif;
   position: relative;
+  outline: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.navbar-center-link:focus-visible {
+  background: rgba(0,0,0,0.03);
+  outline: 2px solid var(--accent-lime);
 }
 
 .navbar-center-link:hover {
@@ -72,8 +80,16 @@
   font-weight: 600;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: 'Inter', sans-serif;
+  outline: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.navbar-link:focus-visible {
+  background: rgba(0,0,0,0.03);
+  outline: 2px solid var(--accent-lime);
 }
 
 .navbar-link:hover {

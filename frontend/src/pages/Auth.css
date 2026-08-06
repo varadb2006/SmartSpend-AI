@@ -73,6 +73,13 @@
 .auth-switch a {
   color: var(--text-primary); text-decoration: none; font-weight: 600;
   border-bottom: 2px solid var(--accent-lime); padding-bottom: 1px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+.auth-switch a:focus-visible {
+  outline: 2px solid var(--accent-lime);
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 .auth-switch a:hover { color: var(--accent-lime); border-bottom-color: transparent; }
 
