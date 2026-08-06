@@ -10,6 +10,10 @@
 @media (max-width: 900px) {
   .chart-grid { grid-template-columns: 1fr; }
   .analytics-grid { grid-template-columns: 1fr; }
+  .anomalies-mini-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .anomalies-mini-grid { grid-template-columns: 1fr; }
 }
 
 /* ── AI Action Cards & Analytics Grid ────────────────────────────────────── */
@@ -18,6 +22,21 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 28px;
+}
+.analytics-grid > .card {
+  height: 100%;
+  justify-content: flex-start;
+}
+.anomalies-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+.anomalies-mini-grid > .card {
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 .ai-card-icon {
   font-size: 32px;

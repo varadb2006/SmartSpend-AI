@@ -161,7 +161,7 @@ export default function Analytics() {
             <BarChart data={categorySpend} layout="vertical" margin={{ left: 20, right: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
               <XAxis type="number" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="cat" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} width={130} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="cat" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} width={160} axisLine={false} tickLine={false} />
               <Tooltip
                 formatter={v => fmt(v)}
                 contentStyle={{ background: 'var(--bg-dark-panel)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, color: '#f5f5f5' }}
@@ -179,7 +179,7 @@ export default function Analytics() {
 
       {/* Anomalies Table */}
       {anomalies.length > 0 && (
-        <div className="analytics-grid mb-24" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+        <div className="anomalies-mini-grid mb-24">
           <div className="card p-16">
             <h4 className="text-secondary mb-4 text-sm">Total Anomalies</h4>
             <p className="font-semibold text-2xl text-amber">{anomalies.length}</p>

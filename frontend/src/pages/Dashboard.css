@@ -12,6 +12,7 @@
   box-shadow: var(--shadow-sm);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between; height: 100%;
 }
 .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-dark); }
 .stat-card .stat-icon {
@@ -22,7 +23,7 @@
 }
 .stat-card .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 .stat-card .stat-value { font-family: 'Outfit', sans-serif; font-size: 1.85rem; font-weight: 700; margin-top: 4px; color: var(--text-primary); }
-.stat-card .stat-change { font-size: 12px; margin-top: 6px; color: var(--text-secondary); }
+.stat-card .stat-change { font-size: 12px; margin-top: 6px; color: var(--text-secondary); margin-bottom: 0; }
 .stat-card .stat-glow { position: absolute; width: 80px; height: 80px; border-radius: 50%; filter: blur(30px); opacity: 0.15; top: -10px; right: -10px; pointer-events: none; }
 
 /* Lime variant (Blue in light theme) */
@@ -40,8 +41,11 @@
 .chart-card {
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);
+  min-width: 0; /* Prevent Recharts blowout */
+  overflow: hidden;
+  display: flex; flex-direction: column;
 }
-.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-shrink: 0; }
 .chart-title { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-primary); }
 
 /* ── Forecast Banner ─────────────────────────────────────────────────────── */
@@ -71,8 +75,8 @@
 }
 .forecast-mini-label {
   font-size: 10px;
-  font-weight: 700;
-  color: rgba(245,245,245,0.4);
+  font-weight: 1000;
+  color: rgba(0, 0, 0, 0.4);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 4px;
@@ -82,9 +86,32 @@
   font-size: 1.4rem;
   color: var(--brand-lime);
   font-weight: 600;
+  line-height: 1;
 }
 .forecast-mini-icon {
   font-size: 28px;
+  display: flex;
+  align-items: center;
+}
+
+/* Fix Recharts Legend Wrapping */
+.recharts-legend-wrapper {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.recharts-default-legend {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.recharts-legend-item {
+  display: inline-flex !important;
+  align-items: center;
+  margin-right: 0 !important;
 }
 
 /* ── Recent Transactions ─────────────────────────────────────────────────── */
@@ -158,7 +185,9 @@
   .chart-grid   { grid-template-columns: 1fr; }
   .stats-grid   { grid-template-columns: 1fr 1fr; }
   .forecast-banner { flex-direction: column; gap: 16px; }
+  .header-flex { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 540px) {
   .stats-grid { grid-template-columns: 1fr; }
+  .forecast-banner-mini { width: 100%; justify-content: space-between; }
 }

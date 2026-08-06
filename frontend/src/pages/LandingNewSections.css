@@ -324,6 +324,7 @@
   
   .lnd-left {
     width: 100%;
+    min-width: 0;
     clip-path: none;
     padding: 120px 40px 60px 40px;
   }

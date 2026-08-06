@@ -110,7 +110,7 @@ export default function Dashboard() {
           <div className="forecast-banner-mini">
             <div>
               <div className="forecast-mini-label">
-                AI Forecast — Next Month
+                <b>AI Forecast — Next Month</b>
               </div>
               <div className="forecast-mini-amount">
                 {fmt(forecast.forecasted_amount)}

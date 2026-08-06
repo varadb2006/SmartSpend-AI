@@ -18,6 +18,7 @@
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    height: 100%;
 }
 
 .adv-card:hover {
@@ -335,6 +336,7 @@
     flex-direction: column;
     position: relative;
     overflow: hidden;
+    height: 100%;
 }
 
 .premium-rec-card.high-priority {

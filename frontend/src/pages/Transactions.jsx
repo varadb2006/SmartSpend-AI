@@ -244,16 +244,16 @@ export default function Transactions() {
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
-        <select className="input input-sm" value={filterType} onChange={e => setFilterType(e.target.value)}>
+        <select className="input" value={filterType} onChange={e => setFilterType(e.target.value)}>
           <option value="all">All Types</option>
           <option value="debit">Debit</option>
           <option value="credit">Credit</option>
         </select>
         <button 
-          className={`btn btn-sm ${showAnomaliesOnly ? 'btn-amber' : 'btn-ghost'}`} 
+          className={`btn ${showAnomaliesOnly ? 'btn-amber' : 'btn-dark'}`} 
           onClick={() => setShowAnomaliesOnly(!showAnomaliesOnly)}
         >
-          <TriangleAlert size={16} className="mr-4" style={{ display: 'inline', verticalAlign: 'text-bottom' }} />
+          <TriangleAlert size={16} />
           {showAnomaliesOnly ? 'Showing Anomalies' : 'Show Anomalies'}
         </button>
       </div>
@@ -286,8 +286,10 @@ export default function Transactions() {
                 {filtered.map(t => (
                   <tr key={t.id} className={t.is_anomaly ? 'anomaly-row' : ''}>
                     <td className="tabular-text text-secondary">{t.transaction_date}</td>
-                    <td className="truncate-text font-semibold">
-                      {t.description}
+                    <td>
+                      <div className="truncate-text font-semibold" title={t.description}>
+                        {t.description}
+                      </div>
                     </td>
                     <td><span className="category-tag">{t.category}</span></td>
                     <td>
@@ -300,7 +302,7 @@ export default function Transactions() {
                     </td>
                     <td>
                       {t.is_anomaly
-                        ? <span className="badge badge-anomaly" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><TriangleAlert size={14} /> Anomaly</span>
+                        ? <span className="badge badge-debit" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><TriangleAlert size={14} /> Anomaly</span>
                         : <span className="badge badge-neutral" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CircleCheck size={14} /> Normal</span>}
                     </td>
                     <td>
