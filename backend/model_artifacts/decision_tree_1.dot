@@ -1,0 +1,21 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname="helvetica"] ;
+edge [fontname="helvetica"] ;
+0 [label="amount <= 310.5\ngini = 0.631\nsamples = 4716\nvalue = [2290, 1141, 1285]\nclass = Moderate Spending", fillcolor="#f7dac5"] ;
+1 [label="gini = 0.0\nsamples = 1163\nvalue = [0, 0, 1163]\nclass = Safe Spending", fillcolor="#8139e5"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="amount <= 1151.5\ngini = 0.48\nsamples = 3553\nvalue = [2290.0, 1141.0, 122.0]\nclass = Moderate Spending", fillcolor="#f3c3a1"] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label="type_encoded <= 0.5\ngini = 0.018\nsamples = 2311\nvalue = [2290, 0, 21]\nclass = Moderate Spending", fillcolor="#e5823b"] ;
+2 -> 3 ;
+4 [label="gini = 0.0\nsamples = 21\nvalue = [0, 0, 21]\nclass = Safe Spending", fillcolor="#8139e5"] ;
+3 -> 4 ;
+5 [label="gini = 0.0\nsamples = 2290\nvalue = [2290, 0, 0]\nclass = Moderate Spending", fillcolor="#e58139"] ;
+3 -> 5 ;
+6 [label="type_encoded <= 0.5\ngini = 0.149\nsamples = 1242\nvalue = [0, 1141, 101]\nclass = Overspending", fillcolor="#4be78c"] ;
+2 -> 6 ;
+7 [label="gini = 0.0\nsamples = 101\nvalue = [0, 0, 101]\nclass = Safe Spending", fillcolor="#8139e5"] ;
+6 -> 7 ;
+8 [label="gini = 0.0\nsamples = 1141\nvalue = [0, 1141, 0]\nclass = Overspending", fillcolor="#39e581"] ;
+6 -> 8 ;
+}

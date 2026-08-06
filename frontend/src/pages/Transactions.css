@@ -1,0 +1,40 @@
+/* ─── Transactions Page Styles ───────────────────────────────────────────── */
+
+/* ── Data Table ──────────────────────────────────────────────────────────── */
+.table-container { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  padding: 11px 16px; text-align: left;
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+.data-table th:first-child { border-radius: var(--radius-xs) 0 0 0; }
+.data-table th:last-child  { border-radius: 0 var(--radius-xs) 0 0; }
+.data-table td {
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--text-primary);
+}
+.data-table tr { transition: background 0.15s; }
+.data-table tr:hover td { background: rgba(0,0,0,0.02); }
+.data-table tr.anomaly-row td { 
+  background: rgba(239, 68, 68, 0.05);
+  border-top: 1px solid rgba(239, 68, 68, 0.5);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.5);
+}
+.data-table tr.anomaly-row td:first-child {
+  border-left: 1px solid rgba(239, 68, 68, 0.5);
+}
+.data-table tr.anomaly-row td:last-child {
+  border-right: 1px solid rgba(239, 68, 68, 0.5);
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+/* ── Transaction Amount Typography ───────────────────────────────────────── */
+.txn-amount {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600; font-size: 15px;
+}
+.txn-amount--credit { color: var(--green); }
+.txn-amount--debit  { color: var(--red); }

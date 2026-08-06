@@ -1,0 +1,112 @@
+/* ─── Auth Shared Styles (Login & Register) ──────────────────────────────── */
+
+.auth-bg {
+  min-height: 100vh; display: flex;
+  background: var(--bg-primary); position: relative;
+}
+
+/* ── Left dark panel ─────────────────────────────────────────────────────── */
+.auth-left {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  padding: 60px 40px; min-height: 100vh;
+  border-right: 1px solid var(--border);
+}
+.auth-left-content { max-width: 420px; }
+.auth-left-tagline {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.8rem; font-weight: 600;
+  color: var(--text-primary); line-height: 1.15; margin-bottom: 20px; letter-spacing: -0.5px;
+}
+.auth-left-tagline em { color: var(--accent-lime); font-style: normal; }
+.auth-left p { color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+
+.auth-hero-image {
+  width: 100%; border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px dashed var(--border-dark);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 10px;
+  min-height: 260px; margin-top: 32px;
+  color: var(--text-light); font-size: 13px;
+}
+.auth-hero-image-icon { font-size: 36px; opacity: 0.4; }
+
+/* ── Right form panel ────────────────────────────────────────────────────── */
+.auth-right {
+  width: 480px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 40px;
+  background: var(--bg-primary);
+}
+.auth-card { width: 100%; max-width: 380px; }
+
+.auth-logo { margin-bottom: 36px; }
+.auth-logo .logo-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.auth-logo .logo-mark-sm {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--accent-lime);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #ffffff;
+  box-shadow: 0 4px 12px rgba(27,116,253,0.2);
+}
+.auth-logo .brand-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px; color: var(--text-primary); font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.auth-logo h1 { font-size: 1.7rem; margin-bottom: 6px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-weight: 600; }
+.auth-logo p  { font-size: 14px; color: var(--text-secondary); }
+
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--text-muted); font-size: 12px; margin: 24px 0 16px;
+}
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.auth-switch { text-align: center; font-size: 13px; color: var(--text-secondary); }
+.auth-switch a {
+  color: var(--text-primary); text-decoration: none; font-weight: 600;
+  border-bottom: 2px solid var(--accent-lime); padding-bottom: 1px;
+}
+.auth-switch a:hover { color: var(--accent-lime); border-bottom-color: transparent; }
+
+.auth-error {
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  color: var(--red); font-size: 13px;
+}
+
+/* ── Auth Feature Chips ──────────────────────────────────────────────────── */
+.auth-feature-chips {
+  display: flex;
+  gap: 8px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.auth-feature-chip {
+  background: rgba(200,241,53,0.12);
+  color: var(--brand-lime);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(200,241,53,0.2);
+}
+
+.btn-login {
+  padding: 13px;
+  border-radius: 10px;
+  margin-top: 4px;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .auth-left  { display: none; }
+  .auth-right { width: 100%; }
+}

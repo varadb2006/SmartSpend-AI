@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core import config
 from app.db.base import Base
 from app.db.session import engine
-from app.api.endpoints import auth, transactions
+from app.api.endpoints import auth, transactions, analytics
+from app.models import spending_analysis # Ensure model is registered
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(title="SmartSpend AI")
@@ -18,6 +19,7 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(transactions.router, prefix="/api/transactions", tags=["Transactions"])
+app.include_router(analytics.router, prefix="/api/analytics", tags=["Analytics"])
 
 @app.get("/")
 def read_root():

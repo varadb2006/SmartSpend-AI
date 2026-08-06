@@ -1,0 +1,159 @@
+/* ─── Upload Page Styles ─────────────────────────────────────────────────── */
+
+.upload-page-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+}
+
+/* ── Drop Zone ───────────────────────────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed var(--border-dark); border-radius: var(--radius-lg);
+  padding: 52px 32px; text-align: center;
+  cursor: pointer; transition: all 0.25s;
+  background: var(--bg-card);
+}
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--accent-lime); background: var(--accent-lime-soft);
+  box-shadow: var(--shadow-md);
+}
+.upload-zone .upload-icon { font-size: 32px; margin-bottom: 12px; }
+.upload-zone h3 { margin-bottom: 4px; }
+.upload-zone p { font-size: 13px; color: var(--text-muted); }
+
+/* ── Upload Layout & Modifiers ───────────────────────────────────────────── */
+.upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+}
+.upload-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* ── Success Card ────────────────────────────────────────────────────────── */
+.success-card {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+.success-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.success-icon {
+  font-size: 28px;
+}
+.success-title {
+  color: var(--green);
+  margin-bottom: 4px;
+}
+.success-desc {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+/* ── Info Panels ─────────────────────────────────────────────────────────── */
+.required-col-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.required-col-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-lime);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.code-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.optional-col-text {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.format-tips-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.format-tip-item {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.format-tip-bullet {
+  color: var(--brand-lime);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+/* ── Info Panel Card ─────────────────────────────────────────────────────── */
+.info-panel-card {
+  background: var(--bg-card);
+}
+.info-panel-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+.info-panel-title {
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-family: 'Outfit', sans-serif;
+}
+.info-panel-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+  .upload-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Info Panel Items ────────────────────────────────────────────────────── */
+.upload-col-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.upload-col-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent-lime); color: #ffffff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+.upload-tip {
+  font-size: 12px; color: var(--text-secondary);
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.upload-tip-dot { color: var(--accent-lime); font-size: 16px; line-height: 1.2; }
+
+/* ── Success Result ──────────────────────────────────────────────────────── */
+.upload-success {
+  display: flex; align-items: center; gap: 12px;
+  border-color: rgba(34,197,94,0.3);
+  background: rgba(34,197,94,0.08);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .upload-page-grid { grid-template-columns: 1fr; }
+}

@@ -14,6 +14,15 @@ class Transaction(Base):
     transaction_type = Column(String, default="EXPENSE")
     
     category = Column(String, default="Uncategorized")
+    predicted_category = Column(String, nullable=True)
+    prediction_confidence = Column(Float, nullable=True)
+    category_confirmed = Column(Boolean, default=False)
+    confirmed_by_user = Column(Boolean, default=False)
+    prediction_correct = Column(Boolean, nullable=True)
+    prediction_time = Column(String, nullable=True)
+    model_version = Column(String, nullable=True)
+    trained_at = Column(String, nullable=True)
     is_anomaly = Column(Boolean, default=False)
+    anomaly_score = Column(Float, nullable=True)
 
     owner = relationship("User", back_populates="transactions")
