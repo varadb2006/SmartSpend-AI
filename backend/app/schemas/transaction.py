@@ -52,3 +52,24 @@ class TransactionPredictRequest(BaseModel):
 class TransactionPredictResponse(BaseModel):
     predicted_category: str
     confidence: float
+
+class TransactionPreview(BaseModel):
+    id: str
+    date: str
+    description: str
+    amount: float
+    type: str
+    category: str
+    confidence: float | None = None
+    status: str 
+    is_corrected: bool = False
+
+class TransactionUploadSummary(BaseModel):
+    rows_found: int
+    imported: int
+    duplicates_removed: int
+    invalid_rows: int
+    ai_categorized: int
+    user_corrected: int
+    average_confidence: float
+    model_updated: bool

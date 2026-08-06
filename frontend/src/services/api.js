@@ -47,11 +47,12 @@ export const transactionsAPI = {
   getAll: (skip = 0, limit = 100) =>
     api.get(`/api/transactions/?skip=${skip}&limit=${limit}`),
   create: (data) => api.post('/api/transactions/', data),
-  upload: (file) => {
+  uploadPreview: (file) => {
     const form = new FormData();
     form.append('file', file);
-    return api.post('/api/transactions/upload', form);
+    return api.post('/api/transactions/upload/preview', form);
   },
+  uploadConfirm: (transactions) => api.post('/api/transactions/upload/confirm', transactions),
   trainCategorizer: () => api.post('/api/transactions/train-categorizer'),
   detectAnomalies: () => api.post('/api/transactions/detect-anomalies'),
   getForecast: () => api.get('/api/transactions/forecast'),

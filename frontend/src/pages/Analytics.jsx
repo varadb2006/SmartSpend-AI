@@ -124,14 +124,15 @@ export default function Analytics() {
           <div className="ai-card-icon"><TriangleAlert size={32} /></div>
           <h3 className="mb-8">Detect Anomalies</h3>
           <p className="ai-card-desc mb-18">
-            Use DBSCAN clustering to identify unusual transactions that deviate from your normal spending.
+            DBSCAN clustering automatically identifies unusual transactions that deviate from your normal spending.
           </p>
           <button
-            className="btn btn-sm btn-amber w-full center-content"
+            className="btn btn-sm btn-ghost w-full center-content"
             onClick={handleDetectAnomalies}
             disabled={detecting}
+            style={{ color: 'var(--amber)' }}
           >
-            {detecting ? ' Detecting...' : ' Detect Anomalies'}
+            {detecting ? ' Re-running...' : ' Re-run Analysis'}
           </button>
         </div>
 
@@ -210,9 +211,9 @@ export default function Analytics() {
         </div>
         {anomalies.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon"><CircleCheck size={32} /></div>
+            <div className="empty-icon"><CircleCheck size={32} color="var(--green)" /></div>
             <h3>No anomalies detected</h3>
-            <p>Run anomaly detection to find unusual transactions</p>
+            <p>Your spending looks perfectly normal! We continuously monitor your transactions in the background.</p>
           </div>
         ) : (
           <div className="table-container">

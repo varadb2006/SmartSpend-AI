@@ -1,0 +1,6 @@
+date,description,amount,type
+2026-08-01,Netflix,15.99,debit
+2026-08-02,Starbucks Coffee,4.50,debit
+2026-08-03,Salary Deposit,5000,credit
+2026-08-04,Uber Ride,18.00,debit
+2026-08-05,Amazon Purchase,150.00,debit

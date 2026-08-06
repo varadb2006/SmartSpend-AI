@@ -9,12 +9,14 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db, SessionLocal
 from app.models.user import User
 from app.models.transaction import Transaction
-from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionPredictRequest, TransactionPredictResponse
+from app.schemas.transaction import TransactionCreate, TransactionResponse, TransactionPredictRequest, TransactionPredictResponse, TransactionPreview, TransactionUploadSummary
 from app.api.deps import get_current_user
 from app.services.categorizer import train_categorizer, predict_categories, predict_categories_with_confidence
 from app.services.anamoly_detector import flag_anomalies
 from app.services.forecaster import forecast_next_month
 from pydantic import BaseModel
+import difflib
+import uuid
 
 router = APIRouter()
 
@@ -30,6 +32,30 @@ def background_train_model(user_id: int):
             df = pd.DataFrame([{"description": t.description, "amount": t.amount, "category": t.category} for t in transactions])
             train_categorizer(df)
             print("✓ Background model training completed.")
+    finally:
+        db.close()
+
+def background_detect_anomalies(user_id: int):
+    print(f"✓ Starting background anomaly detection for user {user_id}")
+    db = SessionLocal()
+    try:
+        transactions = db.query(Transaction).filter(
+            Transaction.user_id == user_id,
+            Transaction.transaction_type.in_(["debit", "DEBIT", "expense", "EXPENSE", "Debit", "Expense"])
+        ).all()
+        
+        if len(transactions) >= 5:
+            df = pd.DataFrame([{"amount": t.amount} for t in transactions])
+            anomaly_flags, anomaly_scores = flag_anomalies(df)
+            
+            for idx, transaction in enumerate(transactions):
+                transaction.is_anomaly = anomaly_flags[idx]
+                transaction.anomaly_score = anomaly_scores[idx]
+            
+            db.commit()
+            print(f"✓ Background anomaly detection complete.")
+    except Exception as e:
+        print(f"Error in background anomaly detection: {e}")
     finally:
         db.close()
 
@@ -69,6 +95,7 @@ def create_transaction(
     
     if transaction_in.category_confirmed:
         background_tasks.add_task(background_train_model, current_user.id)
+    background_tasks.add_task(background_detect_anomalies, current_user.id)
         
     return db_transaction
 
@@ -77,8 +104,8 @@ def get_transactions(db: Session = Depends(get_db), current_user: User = Depends
     transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id).order_by(Transaction.id.desc()).offset(skip).limit(limit).all()
     return transactions
 
-@router.post("/upload")
-async def upload_transactions(file: UploadFile = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+@router.post("/upload/preview", response_model=List[TransactionPreview])
+async def upload_preview(file: UploadFile = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     contents = await file.read()
     filename = file.filename.lower()
 
@@ -92,41 +119,172 @@ async def upload_transactions(file: UploadFile = File(...), db: Session = Depend
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error reading file: {str(e)}")
 
-    required_columns = {"Date", "Description", "Amount", "Transaction_Type"}
-    if not required_columns.issubset(df.columns):
-        raise HTTPException(status_code=400, detail=f"Missing required columns. File must contain: {', '.join(required_columns)}")
+    if df.empty:
+        raise HTTPException(status_code=400, detail="The uploaded file is empty.")
 
-    ml_df = pd.DataFrame({
-        "description": df["Description"].astype(str), 
-        "amount": pd.to_numeric(df["Amount"], errors='coerce').fillna(0.0)
-    })
+    # 1. Fuzzy Column Matching
+    col_map = {}
+    target_cols = {
+        "date": ["date", "transaction date", "txn date", "date of transaction"],
+        "description": ["description", "narration", "merchant", "particulars", "details"],
+        "amount": ["amount", "txn amount", "value", "debit", "credit"],
+        "transaction_type": ["transaction_type", "type", "txn type"],
+        "category": ["category", "expense type"]
+    }
     
-    predicted_categories = predict_categories(ml_df)
-    transaction_Added = 0
+    for df_col in df.columns:
+        df_col_lower = str(df_col).lower().strip()
+        matched = False
+        for target, aliases in target_cols.items():
+            if target in col_map.values(): continue
+            matches = difflib.get_close_matches(df_col_lower, aliases, n=1, cutoff=0.6)
+            if matches:
+                col_map[df_col] = target
+                matched = True
+                break
+        if not matched and "amount" not in col_map.values():
+            if "amt" in df_col_lower: col_map[df_col] = "amount"
+            
+    df = df.rename(columns=col_map)
     
-    for i, (index, row) in enumerate(df.iterrows()):
-        provided_category = row.get("Category")
-        if pd.isna(provided_category) or str(provided_category).strip() == "":
-            final_category = predicted_categories[i] 
-        else:
-            final_category = str(provided_category)
+    # Check minimum requirements
+    required = ["date", "description", "amount"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        raise HTTPException(status_code=400, detail=f"Missing required columns (even after fuzzy matching): {', '.join(missing)}")
 
+    # 2. Data Cleaning
+    original_count = len(df)
+    # Drop rows missing critical data
+    df = df.dropna(subset=["date", "amount"])
+    # Drop duplicates
+    df = df.drop_duplicates(subset=["date", "description", "amount"])
+    
+    # Normalize Date
+    df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    df = df.dropna(subset=["date"])
+
+    # Normalize Amount & Type
+    df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0.0)
+    
+    if "transaction_type" not in df.columns:
+        df["transaction_type"] = df["amount"].apply(lambda x: "DEBIT" if x < 0 else "CREDIT")
+    else:
+        df["transaction_type"] = df["transaction_type"].fillna("").astype(str).str.upper()
+        df["transaction_type"] = df.apply(lambda row: "DEBIT" if row["amount"] < 0 else (row["transaction_type"] if row["transaction_type"] else "DEBIT"), axis=1)
+
+    df["amount"] = df["amount"].abs()
+    df["description"] = df["description"].fillna("Unknown").astype(str).str.strip()
+
+    if "category" not in df.columns:
+        df["category"] = ""
+    df["category"] = df["category"].fillna("").astype(str).str.strip()
+
+    # 3. Predict Missing Categories
+    missing_mask = df["category"] == ""
+    
+    previews = []
+    if missing_mask.any():
+        ml_df = df[missing_mask].copy()
+        predictions = predict_categories_with_confidence(ml_df)
+        
+        pred_idx = 0
+        for idx, row in df.iterrows():
+            is_missing = row["category"] == ""
+            cat = predictions[pred_idx]["category"] if is_missing else row["category"]
+            conf = predictions[pred_idx]["confidence"] if is_missing else None
+            status = "AI Predicted" if is_missing else "Provided"
+            if is_missing: pred_idx += 1
+            
+            previews.append(TransactionPreview(
+                id=str(uuid.uuid4()),
+                date=row["date"],
+                description=row["description"],
+                amount=row["amount"],
+                type=row["transaction_type"],
+                category=cat,
+                confidence=conf,
+                status=status,
+                is_corrected=False
+            ))
+    else:
+        for idx, row in df.iterrows():
+            previews.append(TransactionPreview(
+                id=str(uuid.uuid4()),
+                date=row["date"],
+                description=row["description"],
+                amount=row["amount"],
+                type=row["transaction_type"],
+                category=row["category"],
+                confidence=None,
+                status="Provided",
+                is_corrected=False
+            ))
+
+    return previews
+
+@router.post("/upload/confirm", response_model=TransactionUploadSummary)
+def upload_confirm(
+    transactions: List[TransactionPreview], 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(get_current_user)
+):
+    total_imported = 0
+    ai_categorized = 0
+    user_corrected = 0
+    total_conf = 0.0
+    
+    for t in transactions:
+        # Save to DB
         db_transaction = Transaction(
             user_id=current_user.id,
-            transaction_date=str(row["Date"]),
-            description=str(row["Description"]),
-            amount=float(row["Amount"]),
-            transaction_type=str(row["Transaction_Type"]).upper(),
-            category=final_category
+            transaction_date=t.date,
+            description=t.description,
+            amount=t.amount,
+            transaction_type=t.type.upper(),
+            category=t.category,
+            predicted_category=t.category if t.status == "AI Predicted" else None,
+            prediction_confidence=t.confidence,
+            category_confirmed=t.is_corrected,
+            confirmed_by_user=True,
+            prediction_correct=not t.is_corrected if t.status == "AI Predicted" else None,
+            prediction_time=datetime.utcnow().isoformat() + "Z" if t.status == "AI Predicted" else None
         )
         db.add(db_transaction)
-        transaction_Added += 1
+        total_imported += 1
+        
+        if t.status == "AI Predicted":
+            ai_categorized += 1
+            if t.confidence is not None:
+                total_conf += t.confidence
+        if t.is_corrected:
+            user_corrected += 1
 
     db.commit()
-    return {"message": "File processed successfully", "total_processed": transaction_Added}
+
+    model_updated = False
+    if user_corrected > 0:
+        background_tasks.add_task(background_train_model, current_user.id)
+        model_updated = True
+
+    background_tasks.add_task(background_detect_anomalies, current_user.id)
+
+    avg_conf = (total_conf / ai_categorized) if ai_categorized > 0 else 0.0
+
+    return TransactionUploadSummary(
+        rows_found=len(transactions),
+        imported=total_imported,
+        duplicates_removed=0, # Calculated in preview
+        invalid_rows=0, # Calculated in preview
+        ai_categorized=ai_categorized,
+        user_corrected=user_corrected,
+        average_confidence=avg_conf,
+        model_updated=model_updated
+    )
 
 @router.post("/train-categorizer")
-def trigger_model_training(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def trigger_model_training(background_tasks: BackgroundTasks, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     print("✓ Model training started manually")
     transactions = db.query(Transaction).filter(Transaction.user_id == current_user.id).all()
     if not transactions:
@@ -150,6 +308,8 @@ def trigger_model_training(db: Session = Depends(get_db), current_user: User = D
             t.category = preds[idx]
         
         db.commit()
+
+    background_tasks.add_task(background_detect_anomalies, current_user.id)
 
     return {"message": "XGBoost categorizer trained successfully!"}
 
@@ -214,6 +374,7 @@ def update_transaction_category(
     db.refresh(transaction)
     
     background_tasks.add_task(background_train_model, current_user.id)
+    background_tasks.add_task(background_detect_anomalies, current_user.id)
     
     return {
         "message": "Category updated successfully", 

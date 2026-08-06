@@ -302,7 +302,7 @@ export default function Transactions() {
                     </td>
                     <td>
                       {t.is_anomaly
-                        ? <span className="badge badge-debit" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><TriangleAlert size={14} /> Anomaly</span>
+                        ? <span className="badge badge-debit" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }} title={t.anomaly_score ? `Anomaly Score: ${t.anomaly_score.toFixed(2)}. This expense is an outlier compared to your normal spending.` : 'Unusual spending detected'}><TriangleAlert size={14} /> Anomaly</span>
                         : <span className="badge badge-neutral" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><CircleCheck size={14} /> Normal</span>}
                     </td>
                     <td>
