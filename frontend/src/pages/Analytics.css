@@ -53,8 +53,144 @@
   color: var(--text-secondary);
 }
 .anomaly-card {
-  border-color: var(--amber-soft);
-  background: var(--amber-soft); /* or light orange depending on theme */
+  position: relative;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.03) 0%, var(--bg-card) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.anomaly-card:hover {
+  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.anomaly-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.anomaly-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--amber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.anomaly-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.anomaly-badge.badge-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+.anomaly-badge.badge-healthy {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--green);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.anomaly-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+  width: 100%;
+}
+
+.anomaly-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 80px;
+  justify-content: center;
+}
+
+.anomaly-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.anomaly-stat-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.anomaly-empty-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--green-soft);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.anomaly-empty-icon {
+  color: var(--green);
+  margin-top: 2px;
+}
+
+.anomaly-empty-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.anomaly-empty-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.btn-rerun {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--amber);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: auto;
+}
+.btn-rerun:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.btn-rerun:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.btn-rerun:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
 }
 .forecast-value {
   font-family: 'Outfit', sans-serif;

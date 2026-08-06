@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { transactionsAPI } from '../services/api';
 import Layout from '../components/Layout';
 import toast from 'react-hot-toast';
-import { Bot, TriangleAlert, TrendingUp, BarChart3, CircleCheck } from 'lucide-react';
+import { Bot, TriangleAlert, TrendingUp, BarChart3, CircleCheck, RefreshCw, Loader2 } from 'lucide-react';
 import './Analytics.css';
 
 import {
@@ -19,6 +19,7 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [training, setTraining] = useState(false);
   const [detecting, setDetecting] = useState(false);
+  const [detectSuccess, setDetectSuccess] = useState(false);
 
   const [modelMeta, setModelMeta] = useState(null);
 
@@ -52,10 +53,13 @@ export default function Analytics() {
 
   const handleDetectAnomalies = async () => {
     setDetecting(true);
+    setDetectSuccess(false);
     try {
       const res = await transactionsAPI.detectAnomalies();
       toast.success(`Found ${res.data.anomalies_found} anomalies in ${res.data.total_analyzed} transactions`);
       fetchAll();
+      setDetectSuccess(true);
+      setTimeout(() => setDetectSuccess(false), 3000);
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Detection failed');
     } finally { setDetecting(false); }
@@ -121,18 +125,65 @@ export default function Analytics() {
 
         {/* Detect Anomalies */}
         <div className="card anomaly-card">
-          <div className="ai-card-icon"><TriangleAlert size={32} /></div>
-          <h3 className="mb-8">Detect Anomalies</h3>
-          <p className="ai-card-desc mb-18">
-            DBSCAN clustering automatically identifies unusual transactions that deviate from your normal spending.
+          <div className="anomaly-card-header">
+            <div className="anomaly-card-icon"><TriangleAlert size={20} /></div>
+            <div className={`anomaly-badge ${anomalies.length > 0 ? 'badge-warning' : 'badge-healthy'}`}>
+              {anomalies.length > 0 ? (
+                 <>🟠 {anomalies.length} {anomalies.length === 1 ? 'Anomaly' : 'Anomalies'}</>
+              ) : (
+                 <>🟢 Healthy</>
+              )}
+            </div>
+          </div>
+          
+          <h3 className="ai-card-title mt-4 mb-4">Detect Anomalies</h3>
+          <p className="ai-card-desc mb-0">
+            Automatically detects abnormal spending using DBSCAN clustering.
           </p>
+          
+          <div className="anomaly-divider" />
+          
+          <div className="anomaly-stats">
+            {anomalies.length === 0 ? (
+               <div className="anomaly-empty-state">
+                 <div className="anomaly-empty-icon"><CircleCheck size={16} /></div>
+                 <div>
+                   <span className="anomaly-empty-title">No anomalies detected</span>
+                   <p className="anomaly-empty-desc">Your spending pattern looks normal.</p>
+                 </div>
+               </div>
+            ) : (
+               <>
+                 <div className="anomaly-stat-row">
+                   <span>Last Scan</span>
+                   <span className="anomaly-stat-value">Today {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                 </div>
+                 <div className="anomaly-stat-row">
+                   <span>Transactions Checked</span>
+                   <span className="anomaly-stat-value">{transactions.length}</span>
+                 </div>
+                 <div className="anomaly-stat-row">
+                   <span>Anomalies Found</span>
+                   <span className="anomaly-stat-value text-amber">{anomalies.length}</span>
+                 </div>
+               </>
+            )}
+          </div>
+          
+          <div className="anomaly-divider" />
+          
           <button
-            className="btn btn-sm btn-ghost w-full center-content"
+            className={`btn-rerun ${detecting ? 'detecting' : ''}`}
             onClick={handleDetectAnomalies}
-            disabled={detecting}
-            style={{ color: 'var(--amber)' }}
+            disabled={detecting || detectSuccess}
           >
-            {detecting ? ' Re-running...' : ' Re-run Analysis'}
+            {detecting ? (
+              <><Loader2 className="animate-spin" size={16} /> Analyzing transactions...</>
+            ) : detectSuccess ? (
+              <><CircleCheck size={16} /> Analysis Complete</>
+            ) : (
+              <><RefreshCw size={16} /> Re-run Analysis</>
+            )}
           </button>
         </div>
 
