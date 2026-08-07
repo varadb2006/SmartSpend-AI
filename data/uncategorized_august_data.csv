@@ -1,0 +1,11 @@
+Date,Description,Amount,Transaction_Type,Category
+2026-08-01,Jio Fiber,899.0,DEBIT,
+2026-08-01,Netflix Subscription,649.0,DEBIT,
+2026-08-02,Uber Ride,180.0,DEBIT,
+2026-08-02,Apollo Pharmacy,150.0,DEBIT,
+2026-08-02,BookMyShow,480.0,DEBIT,
+2026-08-03,DMart,1450.0,DEBIT,
+2026-08-03,Starbucks,290.0,DEBIT,
+2026-08-05,Zomato,345.5,DEBIT,
+2026-08-05,Blinkit,520.0,DEBIT,
+2026-08-05,Amazon,1250.0,DEBIT,
